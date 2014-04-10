@@ -1,4 +1,6 @@
-chester-devs
+Chester Devs
 ============
+Available:
 
-Sharing and Scripting For Chester Devs
+* Graph DB Powerpoint Slides
+* Neo4j Cypher Scripts (pending)
