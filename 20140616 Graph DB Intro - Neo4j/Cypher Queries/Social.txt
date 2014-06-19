@@ -1,0 +1,27 @@
+MATCH (p:Person)
+WHERE p.Name = 'Adrian Nichols'
+RETURN p
+
+MATCH (p:Person)-[:MEMBER_OF]->(m:Meetup)
+WHERE p.Name = 'Adrian Nichols'
+RETURN p, m
+
+MATCH (l:Location)<-[:LOCATED_IN]-(p:Person)-[:MEMBER_OF]->(m:Meetup)
+WHERE p.Name = 'Adrian Nichols'
+RETURN p, m, l
+
+MATCH (p:Person)-[:INTERESTED_IN]->(i:Interest), p-[:LOCATED_IN]->(l:Location)
+WHERE l.Name = 'Chester'
+RETURN i.Name, count(p)
+ORDER BY count(p) desc
+
+MATCH (p:Person)-[:LOCATED_IN]->(l:Location)
+RETURN l.Name, count(p)
+ORDER BY count(p) DESC
+
+MATCH (p:Person)
+WHERE not(p-[:INTERESTED_IN]->(:Interest))
+RETURN count(p)
+
+MATCH (a)-[r]->(b)
+RETURN DISTINCT head(labels(a)) AS This, type(r) as To, head(labels(b)) AS That, Count(b) AS Count

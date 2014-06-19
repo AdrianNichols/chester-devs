@@ -1,0 +1,45 @@
+//Linked List
+MATCH (a)-[b]-(c), d DELETE a, b, c, d
+
+CREATE (:Product { Name : 'Shiny Thing' })-[:INFO]->(p:ProductInfo { Price: 10.00, AsAt : '2014-06-13 13:00:00' })-[:CHANGE]->(p)
+
+MATCH (p:Product)-[:INFO]->(root:ProductInfo), (root)-[:CHANGE*0..]->(before),(after)-[:CHANGE*0..]->(root),(before)-[old:CHANGE]->(after)
+WHERE p.Name = 'Shiny Thing'
+AND (before.AsAt < '2014-06-13 15:00:00' OR before = root) AND ('2014-06-13 15:00:00' < after.value OR after =
+  root)
+CREATE UNIQUE (before)-[:CHANGE]->(:ProductInfo { Price: 22.00,  AsAt: '2014-06-13 15:00:00' })-[:CHANGE]->(after)
+DELETE old
+
+
+MATCH (p:Product)-[:INFO]->(root:ProductInfo), (root)-[:CHANGE*0..]->(before),(after)-[:CHANGE*0..]->(root),(before)-[old:CHANGE]->(after)
+WHERE p.Name = 'Shiny Thing'
+AND (before.AsAt < '2014-06-13 16:00:00' OR before = root) AND ('2014-06-13 16:00:00' < after.value OR after =
+  root)
+CREATE UNIQUE (before)-[:CHANGE]->(:ProductInfo { Price: 15.00,  AsAt: '2014-06-13 16:00:00' })-[:CHANGE]->(after)
+DELETE old
+
+MATCH (p:Product)-[:INFO]->(root:ProductInfo)<-[:CHANGE]-(currentState)
+WHERE p.Name = 'Shiny Thing'
+RETURN p.Name, currentState.Price, currentState.AsAt
+
+MATCH (p:Product)-[:INFO]->(root:ProductInfo), (root)-[:CHANGE*0..]->(before),(after)-[:CHANGE*0..]->(root),(before)-[old:CHANGE]->(after)
+WHERE p.Name = 'Shiny Thing'
+AND (before.AsAt < '2014-06-13 17:00:00' OR before = root) AND ('2014-06-13 17:00:00' < after.value OR after =
+  root)
+CREATE UNIQUE (before)-[:CHANGE]->(:ProductInfo { Price: 12.50,  AsAt: '2014-06-13 17:00:00' })-[:CHANGE]->(after)
+DELETE old
+
+MATCH (p:Product)-[:INFO]->(root:ProductInfo)<-[:CHANGE]-(currentState)
+WHERE p.Name = 'Shiny Thing'
+RETURN p.Name, currentState.Price, currentState.AsAt
+
+MATCH (p:Product)-[:INFO]->(root:ProductInfo), (root)-[:CHANGE*0..]->(before),(before)-[delBefore:CHANGE]->(del)-[delAfter:CHANGE]->(after),
+  (after)-[:CHANGE*0..]->(root)
+WHERE p.Name = 'Shiny Thing'
+AND del.AsAt = '2014-06-13 17:00:00'
+CREATE UNIQUE (before)-[:CHANGE]->(after)
+DELETE del, delBefore, delAfter
+
+MATCH (p:Product)-[:INFO]->(root:ProductInfo)<-[:CHANGE]-(currentState)
+WHERE p.Name = 'Shiny Thing'
+RETURN p.Name, currentState.Price, currentState.AsAt

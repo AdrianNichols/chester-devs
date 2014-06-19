@@ -1,0 +1,14 @@
+// Others Bought
+MATCH (p:Product)<-[:BOUGHT]-(c)
+WHERE p.ID IN ['P2', 'P3']
+OPTIONAL MATCH (op)<-[:BOUGHT]-(oc)-[:BOUGHT]->(p)
+WHERE Not(op.ID IN ['P2', 'P3'])
+RETURN op.ID, op.Name, COUNT(DISTINCT oc.ID)
+ORDER BY  COUNT(DISTINCT oc.ID) DESC
+
+// Discount
+MATCH (p:Product)<-[:INCLUDES]-(pr:Promotion)-[:INCLUDES]->(pp)
+WHERE p.ID IN ['P2', 'P3']
+AND NOT(pp.ID IN ['P2', 'P3'])
+WITH COLLECT(DISTINCT pp) AS promos, COUNT(DISTINCT pp.ID) AS prods, pr
+RETURN CASE WHEN prods = 1 THEN promos ELSE null END, pr

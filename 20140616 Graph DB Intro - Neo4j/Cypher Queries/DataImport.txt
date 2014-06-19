@@ -1,0 +1,9 @@
+MATCH (a)-[b]-(c), d DELETE a, b, c, d
+
+LOAD CSV WITH HEADERS FROM "file://C:/Users/Adrian/Desktop/ChesterDevs/data_export.csv" AS csvline
+MERGE (c:Customer { id: csvline.customer_id, name: csvline.customer_name})
+MERGE (o:Order { id: csvline.order_id, dt: csvline.order_Date})
+MERGE (p:Product { id: csvline.product_id, name: csvline.product_name})
+
+MERGE (c)-[:PLACED]->(o)
+MERGE (o)-[:INCLUDES]->(p)
