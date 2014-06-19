@@ -7,7 +7,7 @@ Available:
 * Neo4j Cypher Scripts
 * Meetup Crawler
 * SQL Database used for import data and the import data CSV
-
+* Html/Css/Js files for demos (Recommendations and Shortest vs Cheapest)
 
 I've included the Meetup Crawler but not the database that it would create; as it trawls other people's data (public though it is), the code is included as a demonstration of how to use the neo4jclient - use or misuse of it is down to you!
 
