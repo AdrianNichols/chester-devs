@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Dijkstra</title>
+</head>
+<body>
+<b>Cypher Query: </b>MATCH (l:Location) RETURN l:</b>
+<br/>
+<b>Results:</b>
+<ul id="lox">
+</ul>
+<b>Using the Dijkstra algorithm via the REST API</b>
+<select id="drop_from"></select>
+<select id="drop_to"></select>
+<button id="cheapest" >Cheapest</button>
+
+<div id="answers" style="font-size:40px;font-weight:bolder"></div>
+
+<script src="../js/cypher/queries.js" type="text/javascript"></script>
+<script src="../js/apis/ajax.js" type="text/javascript"></script>
+<script src="../js/jquery.min.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+    $('#cheapest').click(function () {
+        dijkstra($('#drop_from').val(), $('#drop_to').val());
+    });
+
+    $(function() {
+        $.ajax({
+        type: "POST",
+        url: 'http://localhost:7474/db/data/cypher',
+        data:  { 'query' : 'MATCH (l:Location) RETURN l'},
+        success: function (response) {
+            for (var l in response.data){
+                var li = document.createElement('li');
+                li.innerHTML = response.data[l][0].data.name;
+                $(li).attr('data-id', response.data[l][0].self.replace('http://localhost:7474/db/data/node/', ''));
+                var o = document.createElement('option');
+                var n = document.createElement('option');
+                o.text =  response.data[l][0].data.name
+                o.value = response.data[l][0].self.replace('http://localhost:7474/db/data/node/', '');
+
+                n.text =  response.data[l][0].data.name
+                n.value = response.data[l][0].self.replace('http://localhost:7474/db/data/node/', '');
+
+
+                $('#drop_from').append(o);
+                $('#drop_to').append(n);
+
+                $('#lox').append(li);
+            };
+        }
+        });
+    })
+
+
+    function dijkstra (from, to) {
+        var x = {
+            "to": "http://localhost:7474/db/data/node/" + to,
+            "cost_property": "ByRoad",
+            "relationships": {
+                "type": "DISTANCE",
+                "direction": "all"
+            },
+            "algorithm": "dijkstra"
+        };
+
+        $.ajax({
+            type: "POST",
+            url: 'http://localhost:7474/db/data/node/' + from + '/path',
+            accept: 'application/json; charset=UTF-8',
+            contentType: "application/json",
+            'X-Stream': true,
+            data: JSON.stringify(x),
+            success: function (response, xhr, status) {
+              ShowAnswers(response);
+            }
+        });
+    }
+
+    function ShowAnswers(response){
+        var myNode = document.getElementById("answers");
+        myNode.innerHTML = '';
+
+        $('#answers').append(document.createElement('label').innerHTML = 'Total Distance: ' + Math.round(response.weight * 100) / 100);
+
+        var journey = '';
+
+        for(var n in response.nodes)
+        {
+            var id = response.nodes[n].replace('http://localhost:7474/db/data/node/', '');
+            journey += $('li[data-id="' + id + '"]').text() + ((n == response.nodes.length - 1 ) ? '' :  ' -> ');
+        }
+        $('#answers').append(document.createElement('label').innerHTML = '(' + journey + ')');
+    }
+</script>
+</body>
+</html>
